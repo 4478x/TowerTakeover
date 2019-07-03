@@ -7,6 +7,9 @@
 
 using namespace pros;
 
+//Initialize Master Controller
+Controller master(pros::E_CONTROLLER_MASTER);
+
 // Motor Ports
 const int frontLeftPort = 1;
 const int backLeftPort = 2;
@@ -15,12 +18,20 @@ const int backRightPort = 4;
 const int liftPort = 5;
 const int cubeIntakePort = 6;
 
-Motor frontLeftWheel(frontLeftPort, false);
-Motor backLeftWheel(backLeftPort, false);
-Motor frontRightWheel(frontRightPort, true);
-Motor backRightWheel(backRightPort, true);
+//Sensor and Pnuematic Ports
+const int PneumaticsPort = 1;
+
+//Initialize Motors
+Motor frontLeftWheel(frontLeftPort, true);
+Motor backLeftWheel(backLeftPort, true);
+Motor frontRightWheel(frontRightPort, false);
+Motor backRightWheel(backRightPort, false);
 Motor lift(liftPort, false);
 Motor cubeIntake(cubeIntakePort, false);
+
+//Initialize Senosrs and Pneumatics
+ADIPort Pneumatics(PneumaticsPort, E_ADI_DIGITAL_OUT);
+
 
 /*
 * Left Drive
@@ -55,7 +66,6 @@ void RightDrive(int power)
  */
 void opcontrol() {
 
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 	while (true) {
 
@@ -107,6 +117,15 @@ void opcontrol() {
 		else {
 			cubeIntake.set_brake_mode(MOTOR_BRAKE_HOLD);
 			cubeIntake.move_velocity(0);
+		}
+
+		//Gave ability to move Pneumatics
+		if (master.get_digital(DIGITAL_X))
+		{
+			Pneumatics.set_value(HIGH);
+		}
+		else {
+			Pneumatics.set_value(LOW);
 		}
 
 		pros::delay(20);

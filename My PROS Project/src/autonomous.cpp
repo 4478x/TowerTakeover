@@ -4,8 +4,10 @@
 */
 
 #include "main.h"
-
-using namespace okapi;
+#include "AutonCode/Auton1.cpp"
+#include "AutonCode/Auton2.cpp"
+#include "AutonCode/Auton3.cpp"
+#include "AutonCode/Auton4.cpp"
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -22,18 +24,22 @@ void autonomous() {
 
   if (AutoMode == 1)
   {
-    //Autonomous 1
+    //Auotnomous 1
+    Auton1();
   }
   else if (AutoMode == 2)
   {
     //Autonomous 2
+    Auton2();
   }
   else if (AutoMode == 3)
   {
     //Autonomous 3
+    Auton3();
   }
   else {
     //Autonomous 4
+    Auton4();
   }
 
 }

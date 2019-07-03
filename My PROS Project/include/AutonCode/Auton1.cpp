@@ -1,0 +1,24 @@
+/*
+* @author Ryan Nicholas
+* This will contain the code for autonomous 1
+*/
+#include "main.h"
+#include "MotorSensorPorts.h"
+
+using namespace okapi;
+
+float LiftkP = 1;
+float LiftkI = .0001;
+float LiftkD = 0.1;
+
+auto drive = ChassisControllerFactory::create({frontLeftPort, backLeftPort}, {frontRightPort, backRightPort});
+auto lift = AsyncControllerFactory::posPID(liftPort, LiftkP, LiftkI, LiftkD);
+
+void Auton1()
+{
+  //Move Forward and lift at the same time
+  drive.moveDistanceAsync(1000); //Moves 1000 motor degrees
+  lift.setTarget(200);
+  drive.waitUntilSettled(); //Waits until drive has stopped moving before moving to next task
+
+}
