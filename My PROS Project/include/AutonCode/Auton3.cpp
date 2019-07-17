@@ -3,7 +3,6 @@
 * This will contain the code for autonomous 2
 */
 #include "main.h"
-#include "MotorSensorPorts.h"
 
 using namespace okapi;
 
@@ -12,7 +11,9 @@ float LiftkI = .0001;
 float LiftkD = 0.1;
 
 auto drive = ChassisControllerFactory::create({frontLeftPort, backLeftPort}, {frontRightPort, backRightPort});
-auto lift = AsyncControllerFactory::posPID(liftPort, LiftkP, LiftkI, LiftkD);
+//auto lift = AsyncControllerFactory::posPID(liftPort, LiftkP, LiftkI, LiftkD);
+
+auto lift = AsyncControllerFactory::posPID({leftLiftPort, -rightLiftPort}, LiftkP, LiftkI, LiftkD);
 
 void Auton3()
 {

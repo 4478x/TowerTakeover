@@ -10,24 +10,19 @@ using namespace pros;
 //Initialize Master Controller
 Controller master(pros::E_CONTROLLER_MASTER);
 
-// Motor Ports
-const int frontLeftPort = 1;
-const int backLeftPort = 2;
-const int frontRightPort = 3;
-const int backRightPort = 4;
-const int liftPort = 5;
-const int cubeIntakePort = 6;
-
-//Sensor and Pnuematic Ports
-const int PneumaticsPort = 1;
-
 //Initialize Motors
-Motor frontLeftWheel(frontLeftPort, true);
+Motor frontLeftWheel(frontLeftPort, true); //left wheels
 Motor backLeftWheel(backLeftPort, true);
-Motor frontRightWheel(frontRightPort, false);
+Motor midLeftWheel(midLeftPort, true);
+Motor frontRightWheel(frontRightPort, false); //right wheels
 Motor backRightWheel(backRightPort, false);
-Motor lift(liftPort, false);
-Motor cubeIntake(cubeIntakePort, false);
+Motor midRightWheel(midRightPort, false);
+Motor leftLift(leftLiftPort, false); //lift
+Motor rightLift(rightLiftPort, false);
+Motor leftCubeIntake(leftCubeIntakePort, false); //cube intake
+Motor rightCubeIntake(rightCubeIntakePort, false);
+Motor rightOutake(rightCubeTransferPort, false); //Transfer cubes into zone
+Motor leftOutake(leftCubeTransferPort, false);
 
 //Initialize Senosrs and Pneumatics
 ADIPort Pneumatics(PneumaticsPort, E_ADI_DIGITAL_OUT);
@@ -38,8 +33,17 @@ ADIPort Pneumatics(PneumaticsPort, E_ADI_DIGITAL_OUT);
 */
 void LeftDrive(int power)
 {
-	frontLeftWheel.move(power);
-	backLeftWheel.move(power);
+	if (abs(power) > 7)
+	{
+		frontLeftWheel.move(power);
+		midLeftWheel.move(power);
+		backLeftWheel.move(power);
+	}
+	else {
+		frontLeftWheel.move_velocity(0);
+		midLeftWheel.move_velocity(0);
+		backLeftWheel.move_velocity(0);
+	}
 }
 
 /*
@@ -47,8 +51,17 @@ void LeftDrive(int power)
 */
 void RightDrive(int power)
 {
-	frontRightWheel.move(power);
-	backRightWheel.move(power);
+	if (abs(power) > 7)
+	{
+		frontRightWheel.move(power);
+		midRightWheel.move(power);
+		backRightWheel.move(power);
+	}
+	else {
+		frontRightWheel.move_velocity(0);
+		midRightWheel.move_velocity(0);
+		backRightWheel.move_velocity(0);
+	}
 }
 
 /**
@@ -94,29 +107,39 @@ void opcontrol() {
 		// Controls the lift
 		if (master.get_digital(DIGITAL_R1))
 		{
-			lift.move(100);
+			leftLift.move(100);
+			rightLift.move(-100);
 		}
 		else if (master.get_digital(DIGITAL_R2))
 		{
-			lift.move(-100);
+			leftLift.move(-100);
+			rightLift.move(100);
 		}
 		else {
-			lift.set_brake_mode(MOTOR_BRAKE_HOLD);
-			lift.move_velocity(0);
+			leftLift.set_brake_mode(MOTOR_BRAKE_HOLD);
+			rightLift.set_brake_mode(MOTOR_BRAKE_HOLD);
+
+			leftLift.move_velocity(0);
+			rightLift.move_velocity(0);
 		}
 
 		//controls cube intake
 		if (master.get_digital(DIGITAL_L1))
 		{
-			cubeIntake.move(100);
+			leftCubeIntake.move(100);
+			rightCubeIntake.move(-100);
 		}
 		else if (master.get_digital(DIGITAL_L2))
 		{
-			cubeIntake.move(-100);
+			leftCubeIntake.move(-100);
+			rightCubeIntake.move(100);
 		}
 		else {
-			cubeIntake.set_brake_mode(MOTOR_BRAKE_HOLD);
-			cubeIntake.move_velocity(0);
+			leftCubeIntake.set_brake_mode(MOTOR_BRAKE_HOLD);
+			leftCubeIntake.move_velocity(0);
+
+			rightCubeIntake.set_brake_mode(MOTOR_BRAKE_HOLD);
+			rightCubeIntake.move_voltage(0);
 		}
 
 		//Gave ability to move Pneumatics
@@ -126,6 +149,21 @@ void opcontrol() {
 		}
 		else {
 			Pneumatics.set_value(LOW);
+		}
+
+		if (master.get_digital(DIGITAL_DOWN))
+		{
+			rightOutake.move(-100);
+			leftOutake.move(100);
+		}
+		else if (master.get_digital(DIGITAL_UP))
+		{
+			rightOutake.move(100);
+			leftOutake.move(-100);
+		}
+		else {
+			rightOutake.move_velocity(0);
+			leftOutake.move_velocity(0);
 		}
 
 		pros::delay(20);
